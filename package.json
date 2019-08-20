@@ -1,0 +1,44 @@
+{
+  "version": "0.0.1",
+  "files": [
+    "dist"
+  ],
+  "directories": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build-module",
+    "build-module": "rollup -c build/rollup.config.js",
+    "build-examples": "npm run rollup-examples",
+    "rollup-examples": "cd examples && rollup -c",
+    "postversion": "git push && git push --tags"
+  },
+  "author": "Jeshurun Hembd",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^0.11.1",
+    "rollup": "^1.19.4",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^4.2.4"
+  },
+  "name": "map-overlay",
+  "description": "Overlay simple polygons on a rastermap instance",
+  "main": "dist/map-overlay.bundle.js",
+  "module": "dist/map-overlay.bundle.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjhembd/map-overlay.git"
+  },
+  "keywords": [
+    "overlay",
+    "polygon",
+    "rastermap"
+  ],
+  "bugs": {
+    "url": "https://github.com/jjhembd/map-overlay/issues"
+  },
+  "homepage": "https://github.com/jjhembd/map-overlay#readme",
+  "dependencies": {
+    "yawgl": "github:jjhembd/yawgl"
+  }
+}
