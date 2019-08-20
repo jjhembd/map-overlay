@@ -14,6 +14,51 @@ function resizeCanvasToDisplaySize(canvas) {
   return false;
 }
 
+function initGeometry(canvas, map, width, height) {
+  // Input canvas is an HTML Canvas element
+  // Input map is an instance of rastermap
+  // Input width, height are the pixel sizes of the rastermap grid
+
+  return {
+    updatePoly,
+    toPixels,
+  };
+
+  function updatePoly(pOld, pNew) {
+    if (polyMatch(pOld, pNew)) return false;
+    pOld.length = 0;
+    pNew.forEach( pt => pOld.push([pt[0], pt[1]]) ); 
+    return true;
+  }
+
+  function polyMatch(poly1, poly2) {
+    if (poly1.length !== poly2.length) return false;
+    return poly1.every( (pt, i) => pointMatch(pt, poly2[i]) );
+  }
+
+  function pointMatch(p1, p2) {
+    return (p1[0] === p2[0] && p1[1] === p2[1]);
+  }
+
+  function toPixels(pix, raw) {
+    // Update scaling of the overlay canvas vs. the map drawingbuffer
+    let xscale = canvas.width / width;
+    let yscale = canvas.height / height;
+
+    // Clear the pix array
+    pix.length = 0;
+
+    // Convert raw polygon from world X/Y to map pixels
+    const pixPt = [];
+    raw.forEach(pt => {
+      map.xyToMapPixels( pixPt, pt );
+      pixPt[0] *= xscale;
+      pixPt[1] *= yscale;
+      pix.push([pixPt[0], pixPt[1]]);
+    });
+  }
+}
+
 function initRenderer(canvas) {
   // Input canvas is an HTML Canvas element
 
@@ -62,72 +107,37 @@ function init(canvas, map, width, height) {
 
   if (!canvas || canvas.nodeName !== "CANVAS") {
     return console.log("ERROR in mapOverlay: No valid canvas element!");
+  } else if (!map || !map.xyToMapPixels) {
+    return console.log("ERROR in mapOverlay: No valid rastermap instance!");
   }
 
-  // TODO: put all geometry-related stuff in separate file
-  const scale = {
-    x: 1.0, y: 1.0,
-    update: function() {
-      let resized = resizeCanvasToDisplaySize(canvas);
-      this.x = canvas.width / width;
-      this.y = canvas.height / height;
-      return resized;
-    }
-  };
-
-  // Initialize renderer
+  // Initialize geometry methods and renderer
+  const geometry = initGeometry(canvas, map, width, height);
   const renderer = initRenderer(canvas);
+
   // Declare arrays for the polygon, in global and local coordinates
-  const rawQC = [];
-  const pixQC = [];
+  const rawQC = [], pixQC = [];
 
   return {
-    draw,
     reset,
+    draw,
   };
-
-  function draw(p1, p2, mapChanged) {
-    // Check if bounding box changed since last call
-    var boxChanged = updatePoly(rawQC, [p1, p2]);
-    var scaleChanged = scale.update();
-    if (!boxChanged && !scaleChanged && !mapChanged) return;
-    if (canvas.width < 5 || canvas.height < 5) return;
-
-    // Convert box to map pixels and draw
-    toPixels(pixQC, rawQC);
-    renderer.drawBox(pixQC);
-  }
 
   function reset() {
     renderer.clear();
     rawQC.length = 0;
   }
 
-  function toPixels(pix, raw) {
-    pix.length = 0;
-    const pixPt = [];
-    raw.forEach(pt => {
-      map.xyToMapPixels( pixPt, pt );
-      pixPt[0] *= scale.x;
-      pixPt[1] *= scale.y;
-      pix.push([pixPt[0], pixPt[1]]);
-    });
-  }
+  function draw(p1, p2, mapChanged) {
+    // Check if anything changed since last call
+    var polyChanged = geometry.updatePoly(rawQC, [p1, p2]);
+    var canvasResized = resizeCanvasToDisplaySize(canvas);
+    if (!polyChanged && !canvasResized && !mapChanged) return;
+    if (canvas.width < 5 || canvas.height < 5) return;
 
-  function updatePoly(pOld, pNew) {
-    if (polyMatch(pOld, pNew)) return false;
-    pOld.length = 0;
-    pNew.forEach( pt => pOld.push([pt[0], pt[1]]) ); 
-    return true;
-  }
-
-  function polyMatch(poly1, poly2) {
-    if (poly1.length !== poly2.length) return false;
-    return poly1.every( (pt, i) => pointMatch(pt, poly2[i]) );
-  }
-
-  function pointMatch(p1, p2) {
-    return (p1[0] === p2[0] && p1[1] === p2[1]);
+    // Convert box to map pixels and draw
+    geometry.toPixels(pixQC, rawQC);
+    renderer.drawBox(pixQC);
   }
 }
 
