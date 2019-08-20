@@ -30,15 +30,20 @@ export function init(canvas, map, width, height) {
     rawQC.length = 0;
   }
 
-  function draw(p1, p2, mapChanged) {
+  function draw(poly, mapChanged) {
+    // Check for a valid polygon. TODO: Check each element is a valid point?
+    if (poly.length < 2) return;
+
     // Check if anything changed since last call
-    var polyChanged = geometry.updatePoly(rawQC, [p1, p2]);
+    var polyChanged = geometry.updatePoly(rawQC, poly);
     var canvasResized = resizeCanvasToDisplaySize(canvas);
     if (!polyChanged && !canvasResized && !mapChanged) return;
     if (canvas.width < 5 || canvas.height < 5) return;
 
     // Convert box to map pixels and draw
     geometry.toPixels(pixQC, rawQC);
-    renderer.drawBox(pixQC);
+    return (pixQC.length === 2) 
+      ? renderer.drawBox(pixQC)
+      : renderer.drawPoly(pixQC);
   }
 }
