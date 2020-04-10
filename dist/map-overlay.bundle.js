@@ -102,13 +102,13 @@ function initRenderer(canvas) {
 
 function init(canvas, map, width, height) {
   // Input canvas is an HTML Canvas element
-  // Input map is an instance of rastermap
+  // Input map is an instance of tile-frame
   // Input width, height are the pixel sizes of the rastermap grid
 
   if (!canvas || canvas.nodeName !== "CANVAS") {
     return console.log("ERROR in mapOverlay: No valid canvas element!");
   } else if (!map || !map.xyToMapPixels) {
-    return console.log("ERROR in mapOverlay: No valid rastermap instance!");
+    return console.log("ERROR in mapOverlay: No valid tile-frame instance!");
   }
 
   // Initialize geometry methods and renderer

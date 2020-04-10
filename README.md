@@ -24,3 +24,7 @@ are true:
 - polygon is the same as the last call
 - overlay canvas has not changed size
 - mapChanged is false
+
+If the supplied polygon contains exactly two points, they will be treated
+as the top left and bottom right corners of a rectangle, and drawn using the
+Canvas2D strokeRect method.
