@@ -15,10 +15,8 @@
   "author": "Jeshurun Hembd",
   "license": "MIT",
   "devDependencies": {
-    "rollup": "^2.4.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.2.0"
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "rollup": "^2.66.1"
   },
   "name": "map-overlay",
   "description": "Overlay simple polygons on a rastermap instance",
@@ -38,6 +36,6 @@
   },
   "homepage": "https://github.com/jjhembd/map-overlay#readme",
   "dependencies": {
-    "yawgl": "github:jjhembd/yawgl"
+    "yawgl": "^0.4.0"
   }
 }
